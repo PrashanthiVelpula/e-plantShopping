@@ -1,6 +1,6 @@
 import React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { removeItem, updateQuantity } from './CartSlice';
+import { removeItem, updateQuantity} from './CartSlice';
 import './CartItem.css';
 
 const CartItem = ({ onContinueShopping }) => {
@@ -9,27 +9,42 @@ const CartItem = ({ onContinueShopping }) => {
 
   // Calculate total amount for all products in the cart
   const calculateTotalAmount = () => {
- 
-  };
+    return cart.reduce((total, item) => {
+        const quantity = parseFloat(item.quantity) || 0; // Set to 0 if parsing fails
+        const cost = parseFloat(item.cost.replace('$', '')) || 0;         // Set to 0 if parsing fails
+        return total + quantity * cost;
+    }, 0).toFixed(2);
+};
+
+
 
   const handleContinueShopping = (e) => {
-   
+    if (onContinueShopping) onContinueShopping();
   };
 
 
-
-  const handleIncrement = (item) => {
+ const handleIncrement = (item) => {
+    dispatch(updateQuantity({ ...item, quantity: item.quantity + 1 }));
   };
 
   const handleDecrement = (item) => {
-   
+    if (item.quantity > 1) {
+      dispatch(updateQuantity({ ...item, quantity: item.quantity - 1 }));
+    } else {
+      handleRemove(item);
+    }
   };
 
   const handleRemove = (item) => {
+    dispatch(removeItem(item));
   };
 
   // Calculate total cost based on quantity for an item
-  const calculateTotalCost = (item) => {
+  const calculateTotalCost = (item) => (item.cost * item.quantity).toFixed(2);
+  
+
+  const handleCheckoutShopping = (e) => {
+    alert('Functionality to be added for future reference');
   };
 
   return (
@@ -57,7 +72,7 @@ const CartItem = ({ onContinueShopping }) => {
       <div className="continue_shopping_btn">
         <button className="get-started-button" onClick={(e) => handleContinueShopping(e)}>Continue Shopping</button>
         <br />
-        <button className="get-started-button1">Checkout</button>
+        <button className="get-started-button1" onClick={(e) => handleCheckoutShopping(e)}>Checkout</button>
       </div>
     </div>
   );
